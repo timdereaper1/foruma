@@ -1,7 +1,7 @@
 import React from 'react';
-import { useNotification } from '../contexts/NotificationProvider';
+import { useNotification } from '../../contexts/NotificationProvider';
 
-export default function ErrorNotification() {
+export default function Notification() {
 	const { notification, dismissNotification } = useNotification();
 	const duration = notification?.duration;
 
@@ -9,6 +9,5 @@ export default function ErrorNotification() {
 		if (typeof duration === 'number') setTimeout(() => dismissNotification(), duration);
 	}, [duration, dismissNotification]);
 
-	if (notification?.type === 'error') return <div>{notification?.message}</div>;
-	return null;
+	return notification?.message ? <div>{notification?.message}</div> : null;
 }

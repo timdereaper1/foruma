@@ -12,7 +12,9 @@ interface NotificationContextType {
 	dismissNotification(): void;
 }
 
-const NotificationContext = React.createContext<NotificationContextType | undefined>(undefined);
+export const NotificationContext = React.createContext<NotificationContextType | undefined>(
+	undefined
+);
 
 export default function NotificationProvider({ children }: React.PropsWithChildren<{}>) {
 	const [notification, setNotification] = React.useState<Notification | null>(null);
