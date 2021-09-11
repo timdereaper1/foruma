@@ -1,18 +1,20 @@
 import Link from 'next/link';
 import React from 'react';
+import AddPost from 'src/features/Home/AddPost';
+import AuthModal from 'src/features/Home/AuthModal';
 import styled from 'styled-components';
-import { useNotification } from '../common/contexts/NotificationProvider';
-import firebase from '../common/firebase/firebaseApp';
-import { Post } from '../common/types';
+import { useNotification } from 'src/common/contexts/NotificationProvider';
+import firebase from 'src/common/firebase/firebaseApp';
+import { Post } from 'src/common/types';
+import useAuth from 'src/common/hooks/useAuth';
 
 function Index() {
-	const [openPost, setOpenPost] = React.useState(false);
+	const [activeModal, setActiveModalTo] = React.useState<'none' | 'post-modal' | 'auth-modal'>(
+		'none'
+	);
 	const [posts, setPosts] = React.useState<Post[]>([]);
 	const { showErrorNotification } = useNotification();
-	const [values, setValues] = React.useState<Omit<Post, 'id'>>({
-		alias: '',
-		post: '',
-	});
+	const { authUser, signOutUser } = useAuth();
 
 	const isPostsAvailable = Boolean(posts.length);
 
@@ -58,65 +60,40 @@ function Index() {
 		return () => unsubscribe();
 	}, [isPostsAvailable]);
 
-	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-		try {
-			event.preventDefault();
-			showErrorNotification('Success message posted');
-			await firebase
-				.firestore()
-				.collection('posts')
-				.doc()
-				.set({ ...values, createdAt: firebase.firestore.Timestamp.now() });
-			setOpenPost(false);
-			setValues((values) => ({ ...values, post: '' }));
-		} catch (error) {
-			showErrorNotification('Cannot post message, please check your network');
-		}
-	}
-
-	function handleChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-		setValues((prevValues) => ({
-			...prevValues,
-			[event.target.name]: event.target.value,
-		}));
+	function closeModal() {
+		setActiveModalTo('none');
 	}
 
 	return (
 		<div>
 			<Header>
 				<Title>Public forum</Title>
-				<PostBtn onClick={() => setOpenPost(true)}>
-					<i className="fas fa-plus"></i>
-				</PostBtn>
+				{authUser ? (
+					<>
+						<div>{authUser.alias}</div>
+						<button onClick={signOutUser}>Logout</button>
+					</>
+				) : (
+					<button onClick={() => setActiveModalTo('auth-modal')}>Sign In</button>
+				)}
+				{!authUser ? null : (
+					<PostBtn onClick={() => setActiveModalTo('post-modal')}>
+						<i className="fas fa-plus"></i>
+					</PostBtn>
+				)}
 			</Header>
 			<Posts>
 				{posts.map((post) => (
 					<Link key={post.id} href={`/posts/${post.id}`}>
 						<PostItem>
 							<PostContent>{post.post}</PostContent>
-							<PostAlias>{post.alias}</PostAlias>
+							<PostAlias>{post.userId}</PostAlias>
 						</PostItem>
 					</Link>
 				))}
 			</Posts>
-			{openPost ? (
-				<form onSubmit={handleSubmit}>
-					<input
-						type="text"
-						onChange={handleChange}
-						value={values.alias}
-						name="alias"
-						id="alias"
-					/>
-					<textarea
-						name="post"
-						onChange={handleChange}
-						value={values.post}
-						id="post"
-					></textarea>
-					<button type="submit">Post</button>
-				</form>
-			) : null}
+			<AddPost onClose={closeModal} active={activeModal === 'post-modal'} />
+			<AuthModal active={activeModal === 'auth-modal'} onClose={closeModal} />
 		</div>
 	);
 }
