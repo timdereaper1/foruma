@@ -1,5 +1,7 @@
+import { useFormik } from 'formik';
 import { useRouter } from 'next/router';
 import React from 'react';
+import useAuth from 'src/common/hooks/useAuth';
 import { useNotification } from '../../common/contexts/NotificationProvider';
 import firebase from '../../common/firebase/firebaseApp';
 import { Post } from '../../common/types';
@@ -7,20 +9,45 @@ import { Post } from '../../common/types';
 interface Comment {
 	id: string;
 	comment: string;
-	alias: string;
+	userId: string;
 }
 
 export default function PostTemplate() {
 	const [post, setPost] = React.useState<Post | null>(null);
 	const [comments, setComments] = React.useState<Comment[]>([]);
-	const [values, setValues] = React.useState<Omit<Comment, 'id'>>({
-		alias: '',
-		comment: '',
+	const { showErrorNotification, showSuccessNotification } = useNotification();
+	const { handleChange, handleSubmit, values, resetForm } = useFormik({
+		initialValues: {
+			comment: '',
+		},
+		onSubmit() {
+			if (typeof postId !== 'string') return;
+			firebase
+				.firestore()
+				.collection('posts')
+				.doc(postId)
+				.collection('comments')
+				.doc()
+				.set({
+					createdAt: firebase.firestore.Timestamp.now(),
+					comment: values.comment,
+					userId: authUser?.userId,
+				})
+				.then(showSuccessNotificationAndCloseModal)
+				.catch(() => {
+					showErrorNotification('Cannot post message, please check your network');
+				});
+		},
 	});
-	const { showErrorNotification } = useNotification();
 	const { query } = useRouter();
+	const { authUser } = useAuth();
 	const postId = query.id;
 	const isPostAvailable = Boolean(postId);
+
+	function showSuccessNotificationAndCloseModal() {
+		showSuccessNotification('Comment added');
+		resetForm();
+	}
 
 	React.useEffect(() => {
 		if (typeof postId !== 'string') return;
@@ -86,61 +113,32 @@ export default function PostTemplate() {
 		return () => unsubscribe();
 	}, [isPostAvailable, postId]);
 
-	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-		try {
-			if (typeof postId !== 'string') return;
-			event.preventDefault();
-			await firebase
-				.firestore()
-				.collection('posts')
-				.doc(postId)
-				.collection('comments')
-				.doc()
-				.set({ ...values, createdAt: firebase.firestore.Timestamp.now() });
-			setValues((values) => ({ ...values, comment: '' }));
-		} catch (error) {
-			showErrorNotification('Cannot post message, please check your network');
-		}
-	}
-
-	function handleChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-		setValues((prevValues) => ({
-			...prevValues,
-			[event.target.name]: event.target.value,
-		}));
-	}
-
 	return (
 		<div>
 			<header>
 				<h1>{post?.post}</h1>
-				<h5>{post?.alias}</h5>
+				<h5>{post?.userId}</h5>
 			</header>
 			<section>
 				<h2>Comments</h2>
 				{comments.map((comment) => (
 					<div key={comment.id}>
 						<p>{comment.comment}</p>
-						<small>{comment.alias}</small>
+						<small>{comment.userId}</small>
 					</div>
 				))}
 			</section>
-			<form onSubmit={handleSubmit}>
-				<input
-					type="text"
-					onChange={handleChange}
-					value={values.alias}
-					name="alias"
-					id="alias"
-				/>
-				<textarea
-					name="comment"
-					onChange={handleChange}
-					value={values.comment}
-					id="comment"
-				></textarea>
-				<button type="submit">Post</button>
-			</form>
+			{!authUser ? null : (
+				<form onSubmit={handleSubmit}>
+					<textarea
+						name="comment"
+						onChange={handleChange}
+						value={values.comment}
+						id="comment"
+					></textarea>
+					<button type="submit">Post</button>
+				</form>
+			)}
 		</div>
 	);
 }

@@ -47,8 +47,16 @@ export function useNotification() {
 		});
 	}, []);
 
+	const showSuccessNotification = React.useCallback((message: string) => {
+		context?.showNotification({
+			duration: 1000 * 5,
+			message,
+			type: 'success',
+		});
+	}, []);
+
 	if (typeof context === 'undefined')
 		throw new Error('You cannot use `useNotification` outside NotificationProvider');
 
-	return { ...context, showErrorNotification };
+	return { ...context, showErrorNotification, showSuccessNotification };
 }
