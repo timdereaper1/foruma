@@ -1,9 +1,9 @@
 import { useFormik } from 'formik';
 import React from 'react';
 import Modal from 'src/common/components/Modal';
-import { useNotification } from 'src/common/contexts/NotificationProvider';
-import firebase from 'src/common/firebase/firebaseApp';
 import useAuth from 'src/common/hooks/useAuth';
+import { showSuccessNotification } from 'src/common/utilities/notifications';
+import { addPost } from '../../utilities/postService';
 
 interface AddPostProps {
 	active: boolean;
@@ -11,28 +11,16 @@ interface AddPostProps {
 }
 
 export default function AddPost({ active: openPost, onClose }: AddPostProps) {
-	const { showErrorNotification, showSuccessNotification } = useNotification();
 	const { authUser } = useAuth();
 	const { values, handleChange, handleSubmit, resetForm } = useFormik({
-		initialValues: {
-			post: '',
-		},
-		onSubmit() {
-			firebase
-				.firestore()
-				.collection('posts')
-				.doc()
-				.set({
-					createdAt: firebase.firestore.Timestamp.now(),
-					post: values.post,
-					userId: authUser?.userId,
-				})
-				.then(showSuccessNotificationAndCloseModal)
-				.catch(() => {
-					showErrorNotification('Cannot post message, please check your network');
-				});
-		},
+		initialValues: { post: '' },
+		onSubmit,
 	});
+
+	async function onSubmit() {
+		const response = await addPost(values, authUser?.userId);
+		if (response.success) showSuccessNotificationAndCloseModal();
+	}
 
 	function showSuccessNotificationAndCloseModal() {
 		showSuccessNotification('Post created');

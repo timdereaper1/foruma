@@ -1,5 +1,6 @@
-import styled from 'styled-components';
+import React from 'react';
 import Icon from '../Icon';
+import { StyledButton } from './styles';
 
 interface IconButtonProps {
 	iconName: string;
@@ -13,5 +14,3 @@ export default function IconButton({ iconName, onClick }: IconButtonProps) {
 		</StyledButton>
 	);
 }
-
-const StyledButton = styled.button``;

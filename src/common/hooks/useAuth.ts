@@ -1,40 +1,32 @@
 import React from 'react';
-import { User } from '../types';
-import firebase from 'src/common/firebase/firebaseApp';
+import { IAuthenticatedUser } from '../types';
+import {
+	createOrSignIntoAccount,
+	ISignInCredentials,
+	signOut,
+} from 'src/common/utilities/authService';
+import BrowserStorage from 'src/common/utilities/browserStorage';
 
 export default function useAuth() {
-	const [authUser, setAuthUser] = React.useState<User | null>(() => {
-		if (typeof window === 'undefined') return null;
-		const storedUser = window.localStorage.getItem('auth/user');
-		return storedUser ? JSON.parse(storedUser) : null;
+	const [authUser, setAuthUser] = React.useState<IAuthenticatedUser | null>(() => {
+		const storedUser = BrowserStorage.getItem<IAuthenticatedUser>('auth/user');
+		return storedUser ? storedUser : null;
 	});
 
-	React.useEffect(() => {
-		if (typeof window === 'undefined') return;
-
-		firebase.auth().onAuthStateChanged((user) => {
-			if (!user) {
-				window.localStorage.removeItem('auth/user');
-				return setAuthUser(null);
-			}
-			const storedUser = window.localStorage.getItem('auth/user');
-			if (storedUser) return;
-			firebase
-				.firestore()
-				.collection('users')
-				.where('userId', '==', user.uid)
-				.get()
-				.then((snapshot) => {
-					const user = snapshot.docs[0].data() as User;
-					setAuthUser(user);
-					window.localStorage.setItem('auth/user', JSON.stringify(user));
-				});
-		});
-	}, []);
-
-	function signOutUser() {
-		firebase.auth().signOut();
+	async function signInUser(args: ISignInCredentials) {
+		const response = await createOrSignIntoAccount(args);
+		if (response.data) {
+			BrowserStorage.setItem('auth/user', response.data);
+			setAuthUser(response.data ?? null);
+		}
+		return response;
 	}
 
-	return { authUser, signOutUser };
+	function signOutUser() {
+		BrowserStorage.removeItem('auth/user');
+		setAuthUser(null);
+		signOut();
+	}
+
+	return { authUser, signOutUser, signInUser };
 }

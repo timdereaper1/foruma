@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import { ModalWrapper } from './styles';
 
 interface ModalProps {
 	active: boolean;
@@ -9,5 +9,3 @@ interface ModalProps {
 export default function Modal({ active, onClose, children }: React.PropsWithChildren<ModalProps>) {
 	return !active ? null : <ModalWrapper>{children}</ModalWrapper>;
 }
-
-const ModalWrapper = styled.div``;
