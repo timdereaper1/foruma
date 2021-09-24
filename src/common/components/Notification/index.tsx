@@ -6,8 +6,8 @@ import {
 	SHOW_NOTIFICATION,
 } from 'src/common/utilities/notifications';
 import PubSub from 'src/common/utilities/pubSub';
-import styled from 'styled-components';
-import IconButton from '../IconButton';
+import IconButton from 'src/common/components/IconButton';
+import { NotificationWrapper, NotificationText } from './styles';
 
 export default function Notification() {
 	const [notification, setNotification] = React.useState<INotification>();
@@ -22,7 +22,7 @@ export default function Notification() {
 		const handler = () => setNotification(undefined);
 		const eventId = PubSub.subscribe(DISMISS_NOTIFICATION, handler);
 		return () => PubSub.unsubscribe(DISMISS_NOTIFICATION, eventId);
-	});
+	}, []);
 
 	React.useEffect(() => {
 		if (typeof duration === 'number') setTimeout(dismissNotification, duration);
@@ -35,7 +35,3 @@ export default function Notification() {
 		</NotificationWrapper>
 	) : null;
 }
-
-const NotificationWrapper = styled.div``;
-
-const NotificationText = styled.p``;
