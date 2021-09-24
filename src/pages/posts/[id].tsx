@@ -1,3 +1,3 @@
-import ViewPostPage from 'src/features/viewPost';
+import ViewPostPage from 'src/app/modules/viewPost';
 
 export default ViewPostPage;
