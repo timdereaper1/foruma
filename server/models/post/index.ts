@@ -5,7 +5,7 @@ const postSchema = new Schema<IDBPost>(
 	{
 		userId: { type: String, required: true },
 		body: { type: String, required: true },
-		totalComments: Number,
+		totalComments: { type: Number, default: 0 },
 	},
 	{
 		timestamps: true,

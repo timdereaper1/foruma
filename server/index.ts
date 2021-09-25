@@ -6,8 +6,9 @@ import resolvers from 'server/resolvers';
 import { getMongoDBConnection } from './db/connection';
 import DataSource from './dataSource';
 import DataLoaders from './loaders';
+import { getAuthUserId } from './utils/tokens';
 
-async function startAndRunServer() {
+async function main() {
 	await getMongoDBConnection();
 	const typeDefs = importSchema('./schema.graphql');
 	const dataSources = new DataSource();
@@ -15,19 +16,20 @@ async function startAndRunServer() {
 		typeDefs,
 		resolvers,
 		dataSources: () => dataSources as any,
-		context: () => ({
+		context: ({ req }) => ({
 			loaders: new DataLoaders(dataSources),
+			userId: getAuthUserId(req),
 		}),
 	});
 	await server.start();
 	const app = express();
 	server.applyMiddleware({ app });
 	app.listen(PORT, () => {
-		console.log(`Server ready at http://localhost:${PORT}${server.graphqlPath}`);
+		console.log(`Server ready at  http://localhost:${PORT}${server.graphqlPath}`);
 	});
 }
 
-startAndRunServer().catch((reason) => {
+main().catch((reason) => {
 	console.error(reason);
 	process.exit(1);
 });

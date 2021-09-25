@@ -6,6 +6,7 @@ import { IDataSources } from 'server/dataSource/types';
 
 export default class CommentsDataLoader implements ICommentsDataLoader {
 	public getComments: DataLoader<string, (IDBComment & Document<any, any, IDBComment>)[]>;
+	public getUserComments: DataLoader<string, (IDBComment & Document<any, any, IDBComment>)[]>;
 
 	constructor(dataSources: IDataSources) {
 		this.getComments = new DataLoader<string, (IDBComment & Document<any, any, IDBComment>)[]>(
@@ -14,5 +15,13 @@ export default class CommentsDataLoader implements ICommentsDataLoader {
 				return ids.map((id) => comments.filter((comment) => comment.postId === id));
 			}
 		);
+
+		this.getUserComments = new DataLoader<
+			string,
+			(IDBComment & Document<any, any, IDBComment>)[]
+		>(async (ids: readonly string[]) => {
+			const comments = await dataSources.comments.getUsersComments(ids);
+			return ids.map((id) => comments.filter((comment) => comment.userId === id));
+		});
 	}
 }

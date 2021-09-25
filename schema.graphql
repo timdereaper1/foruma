@@ -1,29 +1,60 @@
 type Post {
-	id: String!
+	id: ID!
 	body: String!
 	createdAt: String
 	updatedAt: String
 	totalComments: Int!
 	comments: [Comment]!
+	user: User!
 }
 
 type Comment {
-	id: String!
+	id: ID!
 	body: String!
 	createdAt: String
 	updatedAt: String
 	post: Post!
+	user: User!
+}
+
+type User {
+	id: ID!
+	alias: String!
+	email: String!
+	totalPosts: Int!
+	totalComments: Int!
+	posts: [Post]
+	comments: [Comment]
+	createdAt: String
+	updatedAt: String
+}
+
+type AuthUser {
+	id: ID!
+	alias: String!
+	email: String!
+	totalPosts: Int!
+	totalComments: Int!
+	posts: [Post]
+	comments: [Comment]
+	createdAt: String
+	updatedAt: String
+	token: String!
 }
 
 input AddPost {
 	body: String!
-	userId: String!
 }
 
 input AddComment {
 	body: String!
-	userId: String!
 	postId: String!
+}
+
+input Login {
+	alias: String
+	email: String!
+	password: String!
 }
 
 type Query {
@@ -33,4 +64,5 @@ type Query {
 type Mutation {
 	createNewPost(data: AddPost!): Post!
 	commentOnPost(data: AddComment!): Comment!
+	signInToAccount(data: Login!): AuthUser!
 }

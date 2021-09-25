@@ -11,4 +11,7 @@ export interface ICommentsDataSource {
 	addComment(args: IAddNewDBComment): Promise<IDBComment & Document<any, any, IDBComment>>;
 	getPostComments(id: string): Promise<(IDBComment & Document<any, any, IDBComment>)[]>;
 	getComments(ids: readonly string[]): Promise<(IDBComment & Document<any, any, IDBComment>)[]>;
+	getUsersComments(
+		ids: readonly string[]
+	): Promise<(IDBComment & Document<any, any, IDBComment>)[]>;
 }
