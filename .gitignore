@@ -3,3 +3,7 @@ node_modules
 firebase-config.json
 yarn-error.log
 .vscode
+.env
+.env.local
+.env.development
+.env.production

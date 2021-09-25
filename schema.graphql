@@ -1,0 +1,36 @@
+type Post {
+	id: String!
+	body: String!
+	createdAt: String
+	updatedAt: String
+	totalComments: Int!
+	comments: [Comment]!
+}
+
+type Comment {
+	id: String!
+	body: String!
+	createdAt: String
+	updatedAt: String
+	post: Post!
+}
+
+input AddPost {
+	body: String!
+	userId: String!
+}
+
+input AddComment {
+	body: String!
+	userId: String!
+	postId: String!
+}
+
+type Query {
+	getTrendingPosts: [Post]!
+}
+
+type Mutation {
+	createNewPost(data: AddPost!): Post!
+	commentOnPost(data: AddComment!): Comment!
+}
