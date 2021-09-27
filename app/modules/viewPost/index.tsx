@@ -1,31 +1,35 @@
 import { useRouter } from 'next/router';
 import React from 'react';
-import { IUserPost } from 'app/common/types';
-import { getPostDetails } from './utilities/commentService';
-import usePostComments from './hooks/usePostComments';
 import AddComment from './components/AddComment';
-import ViewPostPageToolbar from './components/ViewPostToolbar';
 import CommentsList from './components/CommentsList';
+import { useGetPostQuery } from 'app/graphql';
+import Toolbar from 'app/common/components/Toolbar';
 
 export default function ViewPostPage() {
-	const [post, setPost] = React.useState<IUserPost | null>(null);
 	const {
 		query: { id: postId },
 	} = useRouter();
-	const comments = usePostComments(postId);
-
-	React.useEffect(() => {
-		async function fetchPostDetails(id: string) {
-			const response = await getPostDetails(id);
-			setPost(response.data ?? null);
-		}
-		if (typeof postId === 'string') fetchPostDetails(postId);
-	}, [postId]);
-
+	const { data, error, loading } = useGetPostQuery({
+		variables: { data: { postId: postId as string } },
+	});
 	return (
 		<div>
-			<ViewPostPageToolbar post={post} />
-			<CommentsList comments={comments} />
+			{loading ? (
+				<div>Loading</div>
+			) : error ? (
+				<div>{error.message}</div>
+			) : data ? (
+				<>
+					<Toolbar />
+					<article>
+						<p>{data.getPost.body}</p>
+						<footer>
+							<small>{data.getPost.user.alias}</small>
+						</footer>
+					</article>
+					<CommentsList comments={data.getPost.comments} />
+				</>
+			) : null}
 			<AddComment postId={postId} />
 		</div>
 	);

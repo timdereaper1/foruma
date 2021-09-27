@@ -1,18 +1,18 @@
 import Link from 'next/link';
 import React from 'react';
-import { IUserPost } from 'app/common/types';
 import { PostAlias, PostContent, PostItem } from './styles';
+import { GetTrendingPostsQuery } from 'app/graphql';
 
 interface IPostCardProps {
-	post: IUserPost;
+	post: GetTrendingPostsQuery['getTrendingPosts'][0];
 }
 
 export default function PostCard({ post }: IPostCardProps) {
 	return (
-		<Link key={post.id} href={`/posts/${post.id}`}>
+		<Link key={post?.id} href={`/posts/${post?.id}`}>
 			<PostItem>
-				<PostContent>{post.post}</PostContent>
-				<PostAlias>{post.userId}</PostAlias>
+				<PostContent>{post?.body}</PostContent>
+				<PostAlias>{post?.user.alias}</PostAlias>
 			</PostItem>
 		</Link>
 	);

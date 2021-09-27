@@ -19,7 +19,7 @@ export default function Toolbar({ children }: React.PropsWithChildren<ToolbarPro
 
 	return (
 		<Header>
-			<Title>Public forum</Title>
+			<Title href="/">Foruma</Title>
 			{authUser ? (
 				<>
 					<div>{authUser.alias}</div>

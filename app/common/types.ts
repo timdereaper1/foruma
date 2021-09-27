@@ -1,13 +1,13 @@
-export interface IUserPost {
-	userId: string;
-	post: string;
-	id: string;
-}
+import { Maybe } from 'app/graphql';
 
 export interface IAuthenticatedUser {
 	alias: string;
-	userId: string;
-	createdAt: unknown;
+	email: string;
+	totalPosts: number;
+	totalComments: number;
+	createdAt?: Maybe<string> | undefined;
+	updatedAt?: Maybe<string> | undefined;
+	token: string;
 }
 
 export interface IApiRequestResponse<T = unknown> {

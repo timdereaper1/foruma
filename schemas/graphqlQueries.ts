@@ -27,6 +27,8 @@ export const ADD_POST_MUTATION = gql`
 				email
 				totalPosts
 				totalComments
+				createdAt
+				updatedAt
 			}
 		}
 	}
@@ -42,6 +44,64 @@ export const ADD_COMMENT_MUTATION = gql`
 			user {
 				alias
 				email
+				totalPosts
+				totalComments
+				createdAt
+				updatedAt
+			}
+		}
+	}
+`;
+
+export const GET_TRENDING_POSTS = gql`
+	query GetTrendingPosts {
+		getTrendingPosts {
+			id
+			body
+			createdAt
+			updatedAt
+			totalComments
+			user {
+				alias
+				email
+				totalPosts
+				totalComments
+				createdAt
+				updatedAt
+			}
+		}
+	}
+`;
+
+export const GET_POST = gql`
+	query GetPost($data: GetPost!) {
+		getPost(data: $data) {
+			id
+			body
+			createdAt
+			updatedAt
+			totalComments
+			user {
+				alias
+				email
+				totalPosts
+				totalComments
+				createdAt
+				updatedAt
+			}
+			comments {
+				id
+				body
+				createdAt
+				updatedAt
+				user {
+					alias
+					email
+					totalPosts
+					totalComments
+					createdAt
+					updatedAt
+				}
 			}
 		}
 	}

@@ -57,8 +57,13 @@ input Login {
 	password: String!
 }
 
+input GetPost {
+	postId: String!
+}
+
 type Query {
 	getTrendingPosts: [Post]!
+	getPost(data: GetPost!): Post!
 }
 
 type Mutation {

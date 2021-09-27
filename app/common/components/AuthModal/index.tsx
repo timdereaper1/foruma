@@ -2,6 +2,7 @@ import { useFormik } from 'formik';
 import Modal from 'app/common/components/Modal';
 import { showSuccessNotification } from 'app/common/utilities/notifications';
 import useAuth from 'app/common/hooks/useAuth';
+import { processErrorAndLogToServer } from 'app/common/utilities/errorService';
 
 interface AuthModalProps {
 	active: boolean;
@@ -21,7 +22,8 @@ export default function AuthModal({ active, onClose }: AuthModalProps) {
 
 	async function onSubmit() {
 		const response = await signInUser(values);
-		if (response.success) showSuccessNotificationAndCloseModal();
+		if (response.errors) processErrorAndLogToServer(response.errors);
+		if (response.data) showSuccessNotificationAndCloseModal();
 	}
 
 	function showSuccessNotificationAndCloseModal() {

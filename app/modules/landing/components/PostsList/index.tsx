@@ -1,17 +1,19 @@
 import React from 'react';
-import { IUserPost } from 'app/common/types';
 import { Posts } from './styles';
 import PostCard from 'app/modules/landing/components/PostCard';
+import { GetTrendingPostsQuery } from 'app/graphql';
 
 interface IPostsListProps {
-	posts: IUserPost[];
+	posts: GetTrendingPostsQuery;
 }
 
 export default function PostsList({ posts }: IPostsListProps) {
-	return (
+	return !posts ? (
+		<div>There is no posts available</div>
+	) : (
 		<Posts>
-			{posts.map((post) => (
-				<PostCard post={post} />
+			{posts.getTrendingPosts.map((post) => (
+				<PostCard key={post?.id} post={post} />
 			))}
 		</Posts>
 	);

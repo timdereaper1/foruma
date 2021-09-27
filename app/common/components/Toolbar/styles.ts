@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import styled from 'styled-components';
 
 export const Header = styled.header`
@@ -9,7 +10,7 @@ export const Header = styled.header`
 	padding: 1rem 2rem;
 `;
 
-export const Title = styled.h1`
+export const Title = styled(Link)`
 	margin: 0;
 	font-size: 1.2rem;
 `;

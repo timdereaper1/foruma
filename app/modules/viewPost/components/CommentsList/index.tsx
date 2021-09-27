@@ -1,8 +1,8 @@
-import { IPostComment } from 'app/modules/viewPost/types';
 import Comment from 'app/modules/viewPost/components/Comment';
+import { GetPostQuery } from 'app/graphql';
 
 interface ICommentsListProps {
-	comments: IPostComment[];
+	comments: GetPostQuery['getPost']['comments'];
 }
 
 export default function CommentsList({ comments }: ICommentsListProps) {
@@ -10,7 +10,7 @@ export default function CommentsList({ comments }: ICommentsListProps) {
 		<section>
 			<h2>Comments</h2>
 			{comments.map((comment) => (
-				<Comment comment={comment} />
+				<Comment key={comment?.id} comment={comment} />
 			))}
 		</section>
 	);

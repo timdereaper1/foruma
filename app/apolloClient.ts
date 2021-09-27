@@ -1,17 +1,32 @@
 import { useMemo } from 'react';
 import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
 import { concatPagination } from '@apollo/client/utilities';
+import { setContext } from '@apollo/client/link/context';
 import merge from 'deepmerge';
 import isEqual from 'lodash/isEqual';
+import BrowserStorage from './common/utilities/browserStorage';
+import { IAuthenticatedUser } from './common/types';
 
 export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__';
 
 let apolloClient: ApolloClient<NormalizedCacheObject>;
 
 function createApolloClient() {
+	const httpLink = new HttpLink({ uri: 'http://localhost:4000/graphql' });
+
+	const authLink = setContext((_, { headers }) => {
+		const storedUser = BrowserStorage.getItem<IAuthenticatedUser>('auth/user');
+		return {
+			headers: {
+				...headers,
+				Authorization: storedUser ? `Bearer ${storedUser.token}` : '',
+			},
+		};
+	});
+
 	return new ApolloClient({
 		ssrMode: typeof window === 'undefined',
-		link: new HttpLink({ uri: 'http://localhost:4000/graphql' }),
+		link: authLink.concat(httpLink),
 		cache: new InMemoryCache({
 			typePolicies: {
 				Query: {

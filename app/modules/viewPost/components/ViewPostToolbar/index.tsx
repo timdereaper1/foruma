@@ -1,21 +1,9 @@
-import Toolbar from 'app/common/components/Toolbar';
-import { IUserPost } from 'app/common/types';
+import { GetPostQuery } from 'app/graphql';
 
 interface IViewPostPostToolbarProps {
-	post: IUserPost | null;
+	post?: GetPostQuery['getPost'];
 }
 
-export default function ViewPostPageToolbar({ post }: IViewPostPostToolbarProps) {
-	return (
-		<>
-			<Toolbar>
-				{!post ? null : (
-					<header>
-						<h1>{post.post}</h1>
-						<h5>{post.userId}</h5>
-					</header>
-				)}
-			</Toolbar>
-		</>
-	);
+export default function ViewPostPageToolbar({}: IViewPostPostToolbarProps) {
+	return <></>;
 }

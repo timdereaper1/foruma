@@ -1,14 +1,14 @@
-import { IPostComment } from 'app/modules/viewPost/types';
+import { GetPostQuery } from 'app/graphql';
 
 interface ICommentProps {
-	comment: IPostComment;
+	comment?: GetPostQuery['getPost']['comments'][0];
 }
 
 export default function Comment({ comment }: ICommentProps) {
 	return (
-		<div key={comment.id}>
-			<p>{comment.comment}</p>
-			<small>{comment.userId}</small>
+		<div>
+			<p>{comment?.body}</p>
+			<small>{comment?.user.alias}</small>
 		</div>
 	);
 }
