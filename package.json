@@ -30,7 +30,7 @@
 		"dev": "next dev",
 		"storybook": "start-storybook -p 6006",
 		"build-storybook": "build-storybook",
-		"dev-server": "ts-node-dev --compiler ttypescript --project tsconfig.server.json ./server/index.ts",
+		"dev-server": "ts-node-dev --compiler ttypescript --project tsconfig.server.json ./src/index.ts",
 		"codegen": "graphql-codegen"
 	},
 	"devDependencies": {
